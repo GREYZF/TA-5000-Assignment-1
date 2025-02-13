@@ -67,15 +67,17 @@ class Element:
         self.nodes = [node1, node2]
 
         self.L = np.sqrt((self.nodes[1].x - self.nodes[0].x)**2.0 + (self.nodes[1].z - self.nodes[0].z)**2.0)
-
-        alpha = np.arctan2 #YOUR CODE HERE
+        delta_x = self.nodes[1].x - self.nodes[0].x
+        delta_z = self.nodes[1].z - self.nodes[0].z
+        alpha = -np.arctan2(delta_z, delta_x)
+        self.alpha_deg = alpha*180/np.pi
 
         T = np.zeros((6, 6))
 
-        T[0, 0] = T[1, 1] = T[3, 3] = T[4, 4] #YOUR CODE HERE
-        T[0, 1] = T[3, 4] #YOUR CODE HERE
-        T[1, 0] = T[4, 3] #YOUR CODE HERE
-        T[2, 2] = T[5, 5] #YOUR CODE HERE
+        T[0, 0] = T[1, 1] = T[3, 3] = T[4, 4]= np.cos(alpha)
+        T[0, 1] = T[3, 4] = -np.sin(alpha)
+        T[1, 0] = T[4, 3] = np.sin(alpha)
+        T[2, 2] = T[5, 5] = 1
 
         self.T = T
         self.Tt = np.transpose(T)
@@ -129,7 +131,14 @@ class Element:
         EI = self.EI
         L = self.L
 
-        #YOUR CODE HERE
+        k[0, 0] = k[3, 3] = EA / L
+        k[0, 3] = k[3, 0] = -EA / L
+        k[1, 1] = k[4, 4] = 12 * EI / L**3
+        k[1, 4] = k[4, 1] = -12 * EI / L**3
+        k[1, 2] = k[2, 1] = k[1, 5] = k[5, 1] = -6 * EI / L**2
+        k[2, 4] = k[4, 2] = k[4, 5] = k[5, 4] = 6 * EI / L**2
+        k[2, 2] = k[5, 5] = 4 * EI / L
+        k[2, 5] = k[5, 2] = 2 * EI / L
 
         return np.matmul(np.matmul(self.Tt, k), self.T)
 
