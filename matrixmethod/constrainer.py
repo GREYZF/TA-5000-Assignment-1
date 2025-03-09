@@ -9,7 +9,7 @@ class Constrainer:
         cons_vals (list): A list of corresponding constraint values.
 
     Methods:
-        fix_dof: Fixes a degree of freedom at a specific value.
+        fix_dof: Fixes a degree of freedom.
         fix_node: Fixes all degrees of freedom of a node.
         full_disp: Combines the displacements of free and constrained degrees of freedom.
         constrain: Applies the constraints to the stiffness matrix and load vector.
@@ -27,17 +27,16 @@ class Constrainer:
         self.cons_dofs = []
         self.cons_vals = []
 
-    def fix_dof (self, node, dof, value = 0):
+    def fix_dof (self, node, dof, value=0):
         """
-        Fixes a degree of freedom  at a specific value.
+        Fixes a degree of freedom.
 
         Args:
             node (Node): The node object.
             dof (int): The index of the degree of freedom to fix.
             value (float, optional): The value to fix the degree of freedom at. Defaults to 0.
         """
-        self.cons_dofs.append(node.dofs[dof])
-        assert value == 0, "Only zero values are supported for now."
+        self.cons_dofs.append((node.dofs[dof]))
         self.cons_vals.append(value)
  
     def fix_node (self, node):
@@ -46,9 +45,12 @@ class Constrainer:
 
         Args:
             node (Node): The node object.
+            dof (int): The index of the degree of freedom to fix.
         """
+
         for dof in [0,1,2]:
             self.fix_dof (node, dof)    
+
 
     def full_disp (self,u_free):
         """
@@ -80,11 +82,11 @@ class Constrainer:
         """
         self.free_dofs = [i for i in range(len(f)) if i not in self.cons_dofs]
         
-        Kff = k[np.ix_(self.free_dofs,self.free_dofs)] # YOUR CODE HERE
-        Kfc = k[np.ix_(self.free_dofs,self.cons_dofs)] # YOUR CODE HERE
-        Ff = f[self.free_dofs] # YOUR CODE HERE
+        Kff = k[np.ix_(self.free_dofs,self.free_dofs)]
+        Kfc = k[np.ix_(self.free_dofs,self.cons_dofs)]
+        Ff = f[self.free_dofs] 
 
-        return Kff, Ff - np.matmul(Kfc,self.cons_vals)
+        return Kff, Ff - np.matmul(Kfc, self.cons_vals)
 
     def support_reactions (self,k,u_free,f):       
         """
@@ -101,7 +103,6 @@ class Constrainer:
         kcf = k[np.ix_(self.cons_dofs,self.free_dofs)]
         kcc = k[np.ix_(self.cons_dofs,self.cons_dofs)]
         fc = np.matmul(kcf,u_free) + np.matmul(kcc,self.cons_vals) - f[self.cons_dofs]
-        
         return fc
 
     def __str__(self):

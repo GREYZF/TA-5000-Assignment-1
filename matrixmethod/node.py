@@ -47,7 +47,7 @@ class Node:
         self.x     = x
         self.z     = z
         self.p     = np.zeros(3)
-        
+
         self.dofs  = [Node.ndof, Node.ndof+1, Node.ndof+2]
 
         Node.ndof += 3
@@ -74,7 +74,6 @@ class Node:
            numpy.array: An array containing the x and z coordinates of the node.
         """
         return np.array([self.x, self.z])
-
     def __str__(self):
         """
         Returns a string representation of the node.
@@ -82,4 +81,4 @@ class Node:
         Returns:
             str: A string representation of the node.
         """
-        return f"This node has:\n - x coordinate={self.x},\n - z coordinate={self.z},\n - degrees of freedom={self.dofs},\n - load vector={self.p}"
+        return f"This node has:\n - x coordinate={self.x},\n - z coordinate={self.z},\n - degrees of freedom={self.dofs},\n - load vector={self.p})"
